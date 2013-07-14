@@ -37,7 +37,7 @@ list.addItem("Tercero")
 root.mainloop()
 ```
 
-## Getting the items in the DNDList from top to bottom
+## Getting the items in the DNDList ordered by y-coordinate
 
 ```python
 list.getOrdered()
