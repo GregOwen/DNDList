@@ -1,26 +1,24 @@
 """
  "  File: dndlist.py
  "  Written By: Gregory Owen
- "  Date: 03-02-2013 
- "  Last Modified: July 13, 2013
  "
- "  A drag-and-drop list widget. Currently only supports text-based label
- "  objects, but could be easily extended to support anything else that can be
- "  put onto a canvas by changing the type of widget in DNDNode.
+ "  A Tkinter-based drag-and-drop list module. Objects in the list may contain
+ "  any type of Tkinter widget (the class is passed as an argument to the
+ "  constructor). Currently configured to work with Label widgets. Working on
+ "  making this more elegant.
 """ 
 
 from Tkinter import *
 
 class DNDNode():
 
-    def __init__(self, string, dndlist):
-        """ Create a new DNDNode object containing a label with the given string
-            that belongs to the given DNDList. """
+    def __init__(self, dndlist, widgetType, **args):
+        """ Create a new DNDNode object containing a widget of the specified type
+            that belongs to the given DNDList. Extra arguments are passed to the
+            widget constructor. """
 
         self.list = dndlist
-
-        self.widget = Label(self.list.canvas, wraplength=500, text=string, 
-                            relief=RAISED, borderwidth=2)
+        self.widget = widgetType(self.list.canvas, **args)
 
         self.window = self.list.canvas.create_window(self.list.center,
                                                      self.list.depth, 
@@ -70,8 +68,10 @@ class DNDList():
 
     def addItem(self, item):
         """ Add a new entry to the list containing item. """
-
-        node = DNDNode(string=item, dndlist=self)
+        
+        args = {"wraplength": 500, "text": item, "relief": RAISED, 
+                "borderwidth": 2}
+        node = DNDNode(dndlist=self, widgetType=Label, **args)
 
         self.elements[node.window] = node
 
@@ -126,6 +126,7 @@ class DNDList():
         x, y = self.getClickCoords()
 
         self.dragData["item"] = self.canvas.find_closest(x, y)[0]
+        self.elements[self.dragData["item"]].widget.lift()
         self.dragData["x"] = x
         self.dragData["y"] = y
         
