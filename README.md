@@ -20,7 +20,8 @@ root = Tk()
 width = 700
 height = 800
 strings = ["First", "Second", "Third"]
-list = DNDList(root, width, height, items=strings)
+labels = [Label(text=s) for s in strings]
+list = DNDList(root, width, height, items=labels)
 root.mainloop()
 ```
 
@@ -31,9 +32,9 @@ root = Tk()
 width = 700
 height = 800
 list = DNDList(root, width, height)
-list.addItem("Primero")
-list.addItem("Segundo")
-list.addItem("Tercero")
+list.addItem(Label(text="Primero"))
+list.addItem(Label(text="Segundo"))
+list.addItem(Label(text="Tercero"))
 root.mainloop()
 ```
 

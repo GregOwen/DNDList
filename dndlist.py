@@ -3,22 +3,21 @@
  "  Written By: Gregory Owen
  "
  "  A Tkinter-based drag-and-drop list module. Objects in the list may contain
- "  any type of Tkinter widget (the class is passed as an argument to the
- "  constructor). Currently configured to work with Label widgets. Working on
- "  making this more elegant.
+ "  any type of Tkinter widget (the widget is passed to the constructor, and its
+ "  master is changed to be the widget's canvas).
 """ 
 
 from Tkinter import *
 
 class DNDNode():
 
-    def __init__(self, dndlist, widgetType, **args):
-        """ Create a new DNDNode object containing a widget of the specified type
-            that belongs to the given DNDList. Extra arguments are passed to the
-            widget constructor. """
+    def __init__(self, dndlist, widget):
+        """ Creates a new DNDNode that is a part of the given DNDlist and
+            contains the given widget. """
 
         self.list = dndlist
-        self.widget = widgetType(self.list.canvas, **args)
+        self.widget = widget
+        self.widget.master = self.list.canvas
 
         self.window = self.list.canvas.create_window(self.list.center,
                                                      self.list.depth, 
@@ -44,7 +43,7 @@ class DNDList():
     def __init__(self, frame, width, height, items=None):
         """ Create a new DNDList object that fits into the given frame and has the
             specified width and height. If a list is passed as items, set the
-            dndlist to contain the elements in items. """
+            dndlist to contain the widgets in items. """
 
         # The size of the offset, in pixels, between two adjacent items in the list
         self.OFFSET = 10
@@ -67,11 +66,9 @@ class DNDList():
                 self.addItem(item)
 
     def addItem(self, item):
-        """ Add a new entry to the list containing item. """
+        """ Add a new entry to the list containing the widget item. """
         
-        args = {"wraplength": 500, "text": item, "relief": RAISED, 
-                "borderwidth": 2}
-        node = DNDNode(dndlist=self, widgetType=Label, **args)
+        node = DNDNode(dndlist=self, widget=item)
 
         self.elements[node.window] = node
 
@@ -164,19 +161,14 @@ if __name__ == "__main__":
     #frame = Frame(root)
     #frame.pack()
     list = DNDList(root, 700, 800)
-    list.addItem("First")
-    list.addItem("Second")
-    list.addItem("Third")
-    list.addItem("Really really really really really really really really really really really really really really really really really really really really really really really really long text.")
 
-    list.getOrdered()
+    args = {"wraplength": 500, "relief": RAISED, "borderwidth": 2}
+    contents = ["First", "Second", "Third", "Really really really really really really really really really really really really really really really really really really really really really really really really long text."]
 
-    """
-    root2 = Tk()
-    frame2 = Frame(root2)
-    frame2.pack()
-    list2 = DNDList(frame2, 700, 800, items=["Primero", "Segundo", "Tercero"])
-    """
+    for c in contents:
+        label = Label(text=c, **args)
+        list.addItem(label)
+
+    print list.getOrdered()
 
     root.mainloop()
-    #root2.mainloop()
