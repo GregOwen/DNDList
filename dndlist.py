@@ -41,11 +41,11 @@ class DNDNode():
 class DNDList():
 
     def __init__(self, frame, width, height, items=None):
-        """ Create a new DNDList object that fits into the given frame and has the
-            specified width and height. If a list is passed as items, set the
-            dndlist to contain the widgets in items. """
+        """ Create a new DNDList object that fits into the given frame and has
+            the specified width and height. If a list is passed as items, set
+            the dndlist to contain the widgets in items. """
 
-        # The size of the offset, in pixels, between two adjacent items in the list
+        # The size of the offset, in pixels, between two adjacent items
         self.OFFSET = 10
 
         self.width = width
@@ -65,6 +65,18 @@ class DNDList():
             for item in items:
                 self.addItem(item)
 
+    def makeCanvas(self):
+        """ Initialize the canvas, including scrollbar. """
+
+        canvas = Canvas(self.frame, width=self.width, height=self.height,
+                        scrollregion=(0, 0, self.width, self.height))
+        scroll = Scrollbar(self.frame, command=canvas.yview)
+        canvas.config(yscrollcommand=scroll.set)
+        canvas.pack(side=LEFT, fill="both", expand=True)
+        scroll.pack(side=RIGHT, fill=Y)
+
+        return canvas
+
     def addItem(self, item):
         """ Add a new entry to the list containing the widget item. """
         
@@ -78,23 +90,16 @@ class DNDList():
         self.depth += self.OFFSET
         self.depth += (bbox[3] - bbox[1])
 
-        # Bind drag and drop capabilities to the widget
-        node.widget.bind("<Button-1>", self.onClick)
-        node.widget.bind("<ButtonRelease-1>", self.onRelease)
-        node.widget.bind("<B1-Motion>", self.onMotion)
-        
+        self.bindDragDrop(node.widget)
+        for widget in node.widget.winfo_children():
+            self.bindDragDrop(widget)
 
-    def makeCanvas(self):
-        """ Initialize the canvas, including scrollbar. """
+    def bindDragDrop(self, widget):
+        """ Bind drag and drop capabilities to widget. """
 
-        canvas = Canvas(self.frame, width=self.width, height=self.height,
-                        scrollregion=(0, 0, self.width, self.height))
-        scroll = Scrollbar(self.frame, command=canvas.yview)
-        canvas.config(yscrollcommand=scroll.set)
-        canvas.pack(side=LEFT, fill="both", expand=True)
-        scroll.pack(side=RIGHT, fill=Y)
-
-        return canvas
+        widget.bind("<Button-1>", self.onClick)
+        widget.bind("<ButtonRelease-1>", self.onRelease)
+        widget.bind("<B1-Motion>", self.onMotion)
 
     """ ------------------------------------------------------------------------- """
     """                         Pointer Coordinate method                         """
